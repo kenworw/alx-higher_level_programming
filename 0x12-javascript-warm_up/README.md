@@ -1,1 +1,1 @@
-These projects are about the basics of JS (A higher level programming language).
+My readme file on 0x12-javascript-warm_up project

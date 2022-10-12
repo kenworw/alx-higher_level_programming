@@ -1,21 +1,31 @@
 #!/usr/bin/python3
 """
-python script that lists all states from the database hbtn_0e_0_usa with
-a given name
+Displays all values in the states table of
+hbtn_0e_0_usa where name matches the argument.
 """
 
-import MySQLdb
-from sys import argv
+if __name__ == '__main__':
+    from sys import argv
+    import MySQLdb as mysql
 
-if __name__ == "__main__":
-    db = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
-                        passwd=argv[2], db=argv[3], charset="utf8")
+    try:
+        db = mysql.connect(host='localhost', port=3306, user=argv[1],
+                           passwd=argv[2], db=argv[3])
+    except Exception:
+        print('Failed to connect to the database')
+        exit(0)
+
+    searched = argv[4]
+
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM states WHERE name LIKE '{:s}' ORDER BY \
-    id ASC".format(argv[4]))
-    rows = cursor.fetchall()
-    for row in rows:
-        if row[1] == argv[4]:
-            print(row)
+
+    cursor.execute("SELECT * FROM states WHERE name = BINARY '{:s}' \
+                    ORDER BY id ASC;".format(searched))
+
+    result_query = cursor.fetchall()
+
+    for row in result_query:
+        print(row)
+
     cursor.close()
     db.close()

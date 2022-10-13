@@ -1,41 +1,25 @@
 #!/usr/bin/python3
 """
-Displays all values in the states table of
-hbtn_0e_0_usa where name matches the argument.
-(Safe from SQL Injection)
+Displays all values in the states table of the database hbtn_0e_0_usa
+whose name matches that supplied as argument.
+Safe from SQL injections.
+Usage: ./3-my_safe_filter_states.py <mysql username> \
+                                    <mysql password> \
+                                    <database name> \
+                                    <state name searched>
 """
+import MySQLdb
+from sys import argv
 
-if __name__ == '__main__':
-    from sys import argv
-    import MySQLdb as mysql
-    import re
-
-    if (len(argv) != 5):
-        print('Use: username, password, database name, state name')
-        exit(1)
-
-    searched = ' '.join(argv[4].split())
-
-    if (re.search('^[a-zA-Z ]+$', searched) is None):
-        print('Enter a valid name state (example: Arizona)')
-        exit(1)
-
-    try:
-        db = mysql.connect(host='localhost', port=3306, user=argv[1],
-                           passwd=argv[2], db=argv[3])
-    except Exception:
-        print('Failed to connect to the database')
-        exit(0)
-
+if __name__ == "__main__":
+    db = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
+                         passwd=argv[2], db=argv[3], charset="utf8")
     cursor = db.cursor()
-
-    cursor.execute("SELECT * FROM states \
-                    WHERE name = '{:s}' ORDER BY id ASC;".format(searched))
-
-    result_query = cursor.fetchall()
-
-    for row in result_query:
+    cursor.execute("SELECT * FROM states WHERE name LIKE %s ORDER BY id ASC",
+                   (argv[4],))
+    rows = cursor.fetchall()
+    for row in rows:
         print(row)
-
     cursor.close()
     db.close()
+    
